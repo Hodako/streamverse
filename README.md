@@ -2,7 +2,7 @@
 
 A high-performance, responsive video streaming platform built with React and TypeScript. This application features a custom-built video engine, administrative controls, and a seamless mobile-first user experience.
 
-[**Live Demo**](https://ai.studio/apps/drive/1rY6eXF-ocgcyhT32xpPce9PvvC2Jpe4p) | [**Report Bug**](https://github.com/your-username/your-repo/issues) | [**Request Feature**](https://github.com/your-username/your-repo/issues)
+[**Live Demo**](https://ai.studio/apps/drive/1rY6eXF-ocgcyhT32xpPce9PvvC2Jpe4p) | [**Report Bug**](https://github.com/hodako/streamverse/issues) | [**Request Feature**](https://github.com/hodako/streamverse/issues)
 
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
