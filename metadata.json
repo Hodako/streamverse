@@ -1,0 +1,5 @@
+{
+  "name": "StreamTube",
+  "description": "A high-performance video streaming interface featuring a massive video grid and creator analytics.",
+  "requestFramePermissions": []
+}
