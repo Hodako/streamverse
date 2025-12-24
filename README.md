@@ -41,14 +41,14 @@ Bash
 
 npm install
 
-
-# Admin Panel URL: http://localhost:3000/adminpageofthesiteforthesite Backend API: http://localhost:4000 
-Admin Credentials: admin@streamtube.local / Admin12345
-
-
 Run the development server:
 
 Bash
 
 npm run dev
 Open http://localhost:5173 to view it in the browser.
+
+# Admin Panel URL: http://localhost:3000/adminpageofthesiteforthesite Backend API: http://localhost:4000 
+### Admin Credentials: admin@streamtube.local / Admin12345
+
+
