@@ -1,78 +1,48 @@
+# Streamverse
 
+A high-performance, responsive video streaming platform built with React and TypeScript. This application features a custom-built video engine, administrative controls, and a seamless mobile-first user experience.
 
-Run and Deploy your app
-This repository contains everything you need to run your AI-powered application locally and deploy it.
+[**Live Demo**](https://ai.studio/apps/drive/1rY6eXF-ocgcyhT32xpPce9PvvC2Jpe4p) | [**Report Bug**](https://github.com/your-username/your-repo/issues) | [**Request Feature**](https://github.com/your-username/your-repo/issues)
 
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-🚀 Getting Started
-Prerequisites
-Node.js (Latest LTS recommended)
+---
 
-An active Gemini API Key
+## ✨ Features
 
-Local Installation
-Clone the repository and install dependencies:
+* **Custom Video Engine:** `SmartVideoPlayer` component with native-feel controls and keyboard shortcuts.
+* **Administrative Suite:** Full video management and dashboard metrics.
+* **User Experience:** * Watch history and "Watch Later" persistence.
+    * Vertical "Shorts" viewing mode.
+    * Responsive Sidebar and Bottom Navigation for mobile.
+* **Preferences:** Localized settings for playback speed and theme.
+
+---
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+* **Node.js** (v18.0 or higher)
+* **npm** or **yarn**
+
+### Local Development
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+   cd your-repo-name
+
+  Install dependencies:
 
 Bash
 
 npm install
-Configure Environment Variables: Create a .env.local file in the root directory (if not already present) and add your API key:
-
-Code snippet
-
-GEMINI_API_KEY=your_api_key_here
-Launch the Development Server:
+Run the development server:
 
 Bash
 
 npm run dev
-The app should now be running at http://localhost:5173 (or the port specified in your terminal).
-
-📂 Project Structure
-Plaintext
-
-/ (Project Root)
-├── components/           # Reusable UI Components
-│   ├── BottomNav.tsx     # Mobile bottom navigation bar
-│   ├── Navbar.tsx        # Top navigation and search bar
-│   ├── Sidebar.tsx       # Collapsible side menu
-│   ├── SmartVideoPlayer.tsx # Video player with custom controls + shortcuts
-│   └── VideoCard.tsx     # Individual video thumbnail component
-│
-├── pages/                # Route pages (React Router)
-│   ├── AdminPage.tsx      # Admin dashboard + video management
-│   ├── HelpPage.tsx       # FAQ + keyboard shortcuts
-│   ├── HistoryPage.tsx    # Watch history
-│   ├── LikedVideosPage.tsx # Liked videos
-│   ├── LoginPage.tsx      # Auth: login
-│   ├── NotFoundPage.tsx   # 404 (doodle) fallback page
-│   ├── ProfilePage.tsx    # User profile
-│   ├── SettingsPage.tsx   # Playback preferences (localStorage)
-│   ├── ShortsPage.tsx     # Shorts viewer
-│   ├── SignupPage.tsx     # Auth: signup
-│   ├── WatchLaterPage.tsx # Saved videos
-│   └── WatchPage.tsx      # Watch video + details + comments
-│
-├── lib/                  # Client-side Utilities & Helpers
-│   ├── api.ts            # HTTP API helpers (admin + user endpoints)
-│   ├── authStorage.ts    # Token/user localStorage management
-│   ├── localUserData.ts  # Local likes/saves/history fallback
-│   └── settingsStorage.ts # Playback settings localStorage
-│
-├── App.tsx               # Main application layout and routing logic
-├── constants.ts          # Mock video data and configuration
-├── index.html            # Main HTML entry point
-├── index.tsx             # React entry point (mounts App to DOM)
-├── metadata.json         # App metadata description
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── types.ts              # TypeScript interfaces/definitions
-└── vite.config.ts        # Vite build tool configuration
-🛠️ Built With
-Vite - Frontend Tooling
-
-React - UI Framework
-
-TypeScript - Type Safety
-
-Google Gemini API - AI Integration
+Open http://localhost:5173 to view it in the browser.
