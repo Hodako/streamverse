@@ -5,10 +5,11 @@ import { Sidebar } from './components/Sidebar';
 import { BottomNav } from './components/BottomNav';
 import { VideoCard } from './components/VideoCard';
 import { WatchPage } from './components/WatchPage';
-import { Video } from './types';
 import { GridSkeleton } from './components/Skeletons';
-import { adminGetSettings, analyticsPing, getCategories, listVideos } from './lib/api';
+import { adminGetSettings, analyticsPing } from './lib/api';
 import { setCachedSiteSettings } from './lib/siteSettings';
+import { useVideoStore } from './store/videoStore';
+import { useCategoryStore } from './store/categoryStore';
 
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
 const SignupPage = React.lazy(() => import('./pages/SignupPage'));
@@ -39,19 +40,15 @@ function App() {
   // Desktop: true = expanded, false = slim
   // Mobile: true = open (overlay), false = closed
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
-  const [categoryOptions, setCategoryOptions] = useState<{ id: string; name: string }[]>([]);
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loadingVideos, setLoadingVideos] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentOffset, setCurrentOffset] = useState(0);
-  const VIDEOS_PER_PAGE = 20;
+
   const location = useLocation();
   const navigate = useNavigate();
   const pathnameRef = useRef(location.pathname);
   const pipWasActiveRef = useRef<boolean>(false);
   const pipVideoElRef = useRef<HTMLVideoElement | null>(null);
+
+  const { videos, loading: loadingVideos, hasMore, fetchInitialVideos, fetchMoreVideos, searchVideos, filterByCategory } = useVideoStore();
+  const { categories, activeCategory, fetchCategories, setActiveCategory } = useCategoryStore();
 
   const isWatchPage = location.pathname.startsWith('/watch');
   const isShortsPage = location.pathname.startsWith('/shorts');
@@ -235,60 +232,9 @@ function App() {
   };
 
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const cats = await getCategories();
-        if (cancelled) return;
-        setCategoryOptions(cats.categories);
-      } catch {
-        if (cancelled) return;
-        setCategoryOptions([]);
-      }
-
-      setLoadingVideos(true);
-      try {
-        const res = await listVideos({ limit: VIDEOS_PER_PAGE, offset: 0 });
-        if (cancelled) return;
-        const items = (res.videos || []) as Video[];
-        setVideos(items);
-        setCurrentOffset(VIDEOS_PER_PAGE);
-        setHasMore(items.length === VIDEOS_PER_PAGE);
-      } catch {
-        if (cancelled) return;
-        setVideos([]);
-        setHasMore(false);
-      } finally {
-        if (!cancelled) setLoadingVideos(false);
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const loadMoreVideos = async () => {
-    if (loadingVideos || !hasMore) return;
-
-    setLoadingVideos(true);
-    try {
-      const res = await listVideos({
-        limit: VIDEOS_PER_PAGE,
-        offset: currentOffset,
-        categoryId: activeCategoryId || undefined,
-      });
-      const items = (res.videos || []) as Video[];
-      setVideos(prev => [...prev, ...items]);
-      setCurrentOffset(prev => prev + VIDEOS_PER_PAGE);
-      setHasMore(items.length === VIDEOS_PER_PAGE);
-    } catch {
-      setHasMore(false);
-    } finally {
-      setLoadingVideos(false);
-    }
-  };
+    void fetchCategories();
+    void fetchInitialVideos();
+  }, [fetchCategories, fetchInitialVideos]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -299,83 +245,27 @@ function App() {
       const clientHeight = document.documentElement.clientHeight;
 
       if (scrollHeight - scrollTop <= clientHeight * 1.5 && hasMore && !loadingVideos) {
-        void loadMoreVideos();
+        void fetchMoreVideos();
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [currentOffset, hasMore, loadingVideos, location.pathname, activeCategoryId]);
+  }, [hasMore, loadingVideos, location.pathname, fetchMoreVideos]);
 
   const handleSearch = (term: string) => {
-    const run = async () => {
-      setActiveCategory('All');
-      setActiveCategoryId(null);
-      setCurrentOffset(0);
-      if (!term) {
-        try {
-          setLoadingVideos(true);
-          const res = await listVideos({ limit: VIDEOS_PER_PAGE, offset: 0 });
-          const items = (res.videos || []) as Video[];
-          setVideos(items);
-          setCurrentOffset(VIDEOS_PER_PAGE);
-          setHasMore(items.length === VIDEOS_PER_PAGE);
-        } catch {
-          setVideos([]);
-          setHasMore(false);
-        } finally {
-          setLoadingVideos(false);
-        }
-        navigate('/');
-        return;
-      }
-
-      try {
-        setLoadingVideos(true);
-        const res = await listVideos({ q: term, limit: VIDEOS_PER_PAGE, offset: 0 });
-        const items = (res.videos || []) as Video[];
-        setVideos(items);
-        setCurrentOffset(VIDEOS_PER_PAGE);
-        setHasMore(items.length === VIDEOS_PER_PAGE);
-      } catch {
-        setVideos([]);
-        setHasMore(false);
-      } finally {
-        setLoadingVideos(false);
-      }
-      navigate('/');
-    };
-
-    void run();
+    if (!term) {
+      void fetchInitialVideos();
+    } else {
+      void searchVideos(term);
+    }
+    navigate('/');
   };
 
   const handleCategoryClick = (cat: string, catId: string | null) => {
-    setActiveCategory(cat);
-    setActiveCategoryId(catId);
-    setCurrentOffset(0);
-
-    const run = async () => {
-      setLoadingVideos(true);
-      try {
-        const res = await listVideos({
-          categoryId: catId || undefined,
-          limit: VIDEOS_PER_PAGE,
-          offset: 0
-        });
-        const items = (res.videos || []) as Video[];
-        setVideos(items);
-        setCurrentOffset(VIDEOS_PER_PAGE);
-        setHasMore(items.length === VIDEOS_PER_PAGE);
-      } catch {
-        setVideos([]);
-        setHasMore(false);
-      } finally {
-        setLoadingVideos(false);
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    void run();
+    setActiveCategory(cat, catId);
+    void filterByCategory(catId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Calculate main margin based on sidebar state (Desktop Only)
@@ -413,12 +303,12 @@ function App() {
                   {/* Categories - Sticky */}
                   <div className="sticky top-14 z-30 bg-yt-black/95 backdrop-blur-sm -mt-0 pt-3 pb-3 px-3 sm:px-0 border-b border-white/5 sm:border-none mb-4">
                     <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                      {(['All', ...categoryOptions.map((c) => c.name)] as string[]).map(cat => (
+                      {(['All', ...categories.map((c) => c.name)] as string[]).map(cat => (
                         <button
                           key={cat}
                           onClick={() => {
                             if (cat === 'All') return handleCategoryClick('All', null);
-                            const found = categoryOptions.find((c) => c.name === cat);
+                            const found = categories.find((c) => c.name === cat);
                             return handleCategoryClick(cat, found ? found.id : null);
                           }}
                           className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
@@ -434,7 +324,7 @@ function App() {
                   </div>
 
                   {/* Grid */}
-                  {loadingVideos ? (
+                  {loadingVideos && videos.length === 0 ? (
                     <GridSkeleton count={15} />
                   ) : videos.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-6 sm:gap-y-8 sm:gap-x-4 px-2 sm:px-0">
@@ -449,6 +339,7 @@ function App() {
                       <button onClick={() => handleCategoryClick('All', null)} className="mt-4 text-blue-400 hover:underline">Clear filters</button>
                     </div>
                   )}
+                  {loadingVideos && videos.length > 0 && <GridSkeleton count={5} />}
                </div>
             } />
 
